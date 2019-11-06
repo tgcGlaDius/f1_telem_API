@@ -7,7 +7,7 @@ class req_404 : public HTTPRequestHandler
 {
 public:
     void handleRequest(HTTPServerRequest &req, HTTPServerResponse &resp) override {
-        resp.setStatus(HTTPResponse::HTTP_OK);
+        resp.setStatus(HTTPResponse::HTTP_BAD_REQUEST);
         resp.setContentType("text/html");
         std::ostream& out = resp.send();
         out << "<h1>404 page not found</h1>";
@@ -169,10 +169,9 @@ int main(int argc, char** argv) {
     Poco::Thread UDP_thread;
     UDP_thread.start(_UDP);
 
-    //create udp server
-
     webserv app;
     int ret = app.run(argc, argv);
+
     _UDP.kill = true;
     UDP_thread.join();
     return ret;

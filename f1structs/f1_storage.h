@@ -43,33 +43,32 @@ typedef Poco::FastMutex mutex;
 
 struct f1_storage {
     mutex Header_mut;
-    PacketHeader Header;
+    PacketHeader Header = {0,};
 
     mutex CarSetups_mut;
-    PacketCarSetupData CarSetupData;
+    PacketCarSetupData CarSetupData = {0,};
 
     mutex CarStatus_mut;
-    PacketCarStatusData CarStatusData;
+    PacketCarStatusData CarStatusData = {0,};
 
     mutex CarTelemetry_mut;
-    PacketCarTelemetryData CarTelemetryData;
+    PacketCarTelemetryData CarTelemetryData = {0,};
 
     mutex Event_mut;
-    PacketEventData EventData;
+    PacketEventData EventData = {0,};
 
     mutex LapData_mut;
-    PacketLapData LapData;
+    PacketLapData LapData = {0,};
 
     mutex Motion_mut;
-    PacketMotionData MotionData;
+    PacketMotionData MotionData = {0,};
 
     mutex Participants_mut;
-    PacketParticipantsData ParticipantsData;
+    PacketParticipantsData ParticipantsData = {0,};
 
     mutex Session_mut;
-    PacketSessionData SessionData;
+    PacketSessionData SessionData = {0,};
 
 };
-
 
 #endif //WEB_SERV_TEST_F1_STORAGE_H

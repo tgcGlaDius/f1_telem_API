@@ -6,15 +6,17 @@
 
 Poco::JSON::Object toJSON(PacketHeader pack){
     Poco::JSON::Object base;
-    base.set("Format", to_string(pack.m_packetFormat));
-    base.set("Version", to_string(pack.m_packetVersion));
-    base.set("packetId", to_string(pack.m_packetId));
-    base.set("sessionUID", to_string(pack.m_sessionUID));
-    base.set("sessionTime", to_string(pack.m_sessionTime));
-    base.set("frameIdentifier", to_string(pack.m_frameIdentifier));
-    base.set("playerCarIndex", to_string(pack.m_playerCarIndex));
+    base.set("Format", pack.m_packetFormat);
+    base.set("Version", pack.m_packetVersion);
+    base.set("packetId", pack.m_packetId);
+    base.set("sessionUID", pack.m_sessionUID);
+    base.set("sessionTime", pack.m_sessionTime);
+    base.set("frameIdentifier", pack.m_frameIdentifier);
+    base.set("playerCarIndex", pack.m_playerCarIndex);
     return base;
 }
+
+
 
 Poco::JSON::Object toJSON(PacketCarSetupData pack){
     Poco::JSON::Object base;
