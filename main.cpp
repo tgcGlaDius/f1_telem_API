@@ -22,6 +22,7 @@ public:
         resp.set("Access-Control-Allow-Headers", "*");
         Poco::JSON::Object::Ptr test = new Poco::JSON::Object;
         test->set("num", rand());
+
         resp.setStatus(HTTPResponse::HTTP_OK);
         resp.setContentType("application/json");
         std::ostream& out = resp.send();
