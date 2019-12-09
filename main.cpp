@@ -33,10 +33,14 @@ public:
         auto params = uri.getQueryParameters();
         const std::string req_name = "req";
         std::vector<std::string> requests;
+        bool debug = false;
 
         for(const auto& i : params){
             if(i.first == req_name){
                 requests.push_back(i.second);
+            }
+            else if(i.first == "debug" && i.second == "true"){
+                debug=true;
             }
         }
 
@@ -101,6 +105,23 @@ public:
                 telem->Session_mut.unlock();
                 base_obj->set("SessionData", toJSON(p));
             }
+            if(find(requests.begin(), requests.end(), "timing") != requests.end()){
+                telem->timing_mut.lock();
+                auto p = telem->driver_diffs;
+                telem->timing_mut.unlock();
+                base_obj->set("timing", p);
+                #if DEBUG
+                if(debug){
+                    telem->diff_sys_mut.lock();
+                    if(telem->system != nullptr){
+                        base_obj->set("timing_system", *telem->system);
+                    }
+                    telem->diff_sys_mut.unlock();
+
+                }
+                #endif
+            }
+
 
 
             resp.setStatus(HTTPResponse::HTTP_OK);

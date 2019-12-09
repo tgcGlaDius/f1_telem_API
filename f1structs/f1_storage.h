@@ -69,6 +69,14 @@ struct f1_storage {
     mutex Session_mut;
     PacketSessionData SessionData = {0,};
 
+    mutex timing_mut;
+    std::vector<float> driver_diffs;
+
+#if DEBUG
+    mutex diff_sys_mut;
+    std::vector<bool>* system = nullptr;
+#endif
+
 };
 
 #endif //WEB_SERV_TEST_F1_STORAGE_H

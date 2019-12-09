@@ -73,7 +73,7 @@ void udp_reciver::run() {
     }
 }
 
-void udp_reciver::init_postpacket() {
+inline void udp_reciver::init_postpacket() {
     post_packet[PacketType::LAP_DATA_PACKET].push_back(make_unique<timing_handler>(telem));
 }
 
@@ -86,6 +86,7 @@ void udp_reciver::on_new_packet() {
     auto session_dat = telem->SessionData;
     telem->Session_mut.unlock();
     if(current_session_UID != session_dat.m_header.m_sessionUID){
+        tp.joinAll();
         for(auto &i: post_packet){
             for(auto &a: i){
                 a->on_new_session(session_dat);
