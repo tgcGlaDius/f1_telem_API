@@ -44,6 +44,17 @@
 #include <Poco/Net/DatagramSocket.h>
 #include "Poco/Exception.h"
 
+#include <Poco/Message.h>
+#include <Poco/Logger.h>
+#include <Poco/ConsoleChannel.h>
+#include <Poco/AsyncChannel.h>
+#include <Poco/AutoPtr.h>
+#include <Poco/SplitterChannel.h>
+#include <Poco/FileChannel.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>
+
+
 #include "f1structs/f1_storage.h"
 
 #endif //WEB_SERV_TEST_SHARED_HEADER_H

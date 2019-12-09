@@ -5,8 +5,10 @@
 #include "udp_reciver.h"
 void udp_reciver::run() {
     ds.bind(sa);
-    std::cout << "startet UDP thread" << std::endl;
-    int prev_size = 0;
+    logger.information("started UDP thread");
+
+    init_postpacket();
+
     while (!kill){
         int size = ds.available();
         if( size >= sizeof(PacketHeader)){
@@ -57,15 +59,54 @@ void udp_reciver::run() {
                     memcpy(&telem->SessionData, buffer.get(), sizeof(PacketSessionData));
                     telem->Session_mut.unlock();
                 }
+
+                this->on_new_packet();
             } else{
-                std::cout << "invalid packet format: " << header->m_packetFormat << std::endl;
+                logger.warning("invalid packet format: " + to_string(header->m_packetFormat));
             }
 
-
-
         } else if(size != 0){
+            logger.warning("got invalid packet of size " + to_string(size));
             char a;
             ds.receiveBytes(&a, 1);
+        }
+    }
+}
+
+void udp_reciver::init_postpacket() {
+    post_packet[PacketType::LAP_DATA_PACKET].push_back(make_unique<timing_handler>(telem));
+}
+
+void udp_reciver::on_new_packet() {
+    telem->Header_mut.lock();
+    auto packid = telem->Header.m_packetId;
+    telem->Header_mut.unlock();
+
+    telem->Session_mut.lock();
+    auto session_dat = telem->SessionData;
+    telem->Session_mut.unlock();
+    if(current_session_UID != session_dat.m_header.m_sessionUID){
+        for(auto &i: post_packet){
+            for(auto &a: i){
+                a->on_new_session(session_dat);
+            }
+        }
+        current_session_UID = session_dat.m_header.m_sessionUID;
+    }
+
+    for(unsigned long a = 0; a<post_packet[packid].size(); a++){
+        const auto &i = post_packet[packid][a];
+        try{
+            if(!i->running){
+                tp.start(*i);
+            }
+        }
+        catch(const Poco::NoThreadAvailableException& e){
+            while(tp.available()<=0){}
+            a--;
+        }
+        catch(const Poco::Exception& e){
+            logger.fatal(e.what());
         }
     }
 }
