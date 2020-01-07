@@ -4,8 +4,8 @@ make f1 udp telemetry accessible over http
 # Requirements
 Poco (Net/JSON/Foundation/Util)
 
-#Usage
-##Config
+# Usage
+## Config
 there is a standard config file called `f1_telem_API.properties` in the git repository that contains all the 
 supported options as well as their default values. The config file has to be called `f1_telem_API.properties`
 and has to be placed in the same directory as the executable or else the program wont find the file.
@@ -38,42 +38,42 @@ https://forums.codemasters.com/topic/30601-f1-2018-udp-specification/
 
 The different packets are: 
 ##
-###Header
+### Header
 this is the header that accompanies every UDP packet and will always be the last one that was received. 
 contains information like what index in the arrays the player is at and the current session timestamp.
 
 all the other packets also contain the header that last accompanied that packet.
 
-###CarSetups
+### CarSetups
 this is the packet where the setups of all the cars are described. this is things like front/rear wing downforce
 levels as well as ballast and fuel load that the car left parc ferme with. 
 
-###CarStatus
+### CarStatus
 this packet details the status of all the cars in the race. it includes things like damage and
 the current marshal flag for the car
 
-###CarTelemetry
+### CarTelemetry
 this is the telemetry packet for the cars. this includes things like speed, throttle application and drs status
 
-###EventData
+### EventData
 this literally just includes the event string code. get details about this code from the link above
 
-###LapData
+### LapData
 this packet gives lap data for all the cars. things like the sector times, the previous lap time and the car position.
 
-###MotionData
+### MotionData
 this gives motion information about the cars like its velocity in the three dimensions as well as its position
 on track and its G-forces.
 
-###Participants
+### Participants
 this packet contains information about all the participants in the race like their name
 and if they are AI controlled 
 
-###SessionData
+### SessionData
 this packet contains information about the current session like for example the track temperature and the
 status of all the marshal posts
 
-###timing
+### timing
 time difference between the drivers is not something the f1 game send itself but is something this program provides.
 
 ##
