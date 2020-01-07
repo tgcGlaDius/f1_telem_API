@@ -71,10 +71,20 @@ void udp_reciver::run() {
             ds.receiveBytes(&a, 1);
         }
     }
+
+    tp.joinAll();
 }
 
 inline void udp_reciver::init_postpacket() {
-    post_packet[PacketType::LAP_DATA_PACKET].push_back(make_unique<timing_handler>(telem));
+    post_packet[PacketType::LAP_DATA_PACKET].emplace_back(make_unique<timing_handler>(telem));
+
+
+    int max_post_packet_threads = 16;
+    try {
+        max_post_packet_threads = conf.getInt("UDP.max_post_packet_threads");
+    }
+    catch(Poco::NotFoundException& e){}
+    tp.addCapacity(max_post_packet_threads-tp.capacity());
 }
 
 void udp_reciver::on_new_packet() {

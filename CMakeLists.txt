@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 project(f1_telem_API)
 
 set(CMAKE_CXX_STANDARD 14)

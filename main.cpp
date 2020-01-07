@@ -35,7 +35,7 @@ public:
         std::vector<std::string> requests;
         bool debug = false;
 
-        for(const auto& i : params){
+        for(const auto& i : params){ // parse options
             if(i.first == req_name){
                 requests.push_back(i.second);
             }
@@ -169,43 +169,75 @@ public:
 protected:
 
     int main(const std::vector<std::string> &) override {
+        Poco::Util::LayeredConfiguration& conf = config();
+
         AutoPtr<ConsoleChannel> pCons(new ConsoleChannel);
-        AutoPtr<FileChannel> pFile(new FileChannel);
+
         AutoPtr<PatternFormatter> pPF(new PatternFormatter);
 
         pPF->setProperty("pattern", "[%p][%d-%m-%Y][UTC:%H:%M:%S][PID:%P][TID:%I][ %t ]");
 
-        AutoPtr<FormattingChannel> pFC(new FormattingChannel(pPF, pFile));
-
-        pFile->setProperty("purgeAge", "4 weeks");
-        pFile->setProperty("purgeCount", "5");
-        pFile->setProperty("path", "/var/log/f1_telem/f1_telem.log");
-        pFile->setProperty("rotation", "5 M");
-        pFile->setProperty("archive", "timestamp");
+        string log_file, base_dir = conf.getString("application.dir");
 
         AutoPtr<FormattingChannel> pFCons(new FormattingChannel(pPF, pCons));
-
-
-        AutoPtr<AsyncChannel> pAsync(new AsyncChannel(pFC));
         AutoPtr<AsyncChannel> pAsynccon(new AsyncChannel(pFCons));
 
-        Logger::root().setChannel(pAsync);
         Logger::root().setLevel(Message::PRIO_INFORMATION);
         Logger& logger = Logger::get("MainLogger");
         logger.setLevel(Message::PRIO_DEBUG);
         logger.setChannel(pAsynccon);
         setLogger(logger);
 
+        try{
+            log_file = conf.getString("logger.file_name");
+        }
+        catch(Poco::NotFoundException& e){}
+        catch (std::exception& e){
+            throw;
+        }
+
+        if(!log_file.empty()){ // if log file has been specified
+            AutoPtr<FileChannel> pFile(new FileChannel);
+            AutoPtr<FormattingChannel> pFC(new FormattingChannel(pPF, pFile));
+
+            pFile->setProperty("purgeAge", "4 weeks");
+            pFile->setProperty("purgeCount", "5");
+            pFile->setProperty("path", base_dir+"/"+log_file);
+            pFile->setProperty("rotation", "5 M");
+            pFile->setProperty("archive", "timestamp");
+            AutoPtr<AsyncChannel> pAsync(new AsyncChannel(pFC));
+            Logger::root().setChannel(pAsync);
+        } else{
+            logger.information("no log file specified, only logging to console.");
+        }
+
+
         std::shared_ptr<f1_storage> stor = make_shared<f1_storage>();
         f12018_telem_handler::set_storage(stor);
 
-        udp_reciver _UDP(stor, logger);
+        int UDP_port = 20777;
+        string UDP_addr = "0.0.0.0";
+        try{
+            UDP_port = conf.getInt("UDP.port");
+        }
+        catch(NotFoundException& e){}
+
+        try{
+            UDP_addr = conf.getString("UDP.address");
+        }
+        catch(NotFoundException& e){}
+
+        udp_reciver _UDP(stor, conf, logger, UDP_port, UDP_addr);
         Poco::Thread UDP_thread;
         UDP_thread.start(_UDP);
 
+        unsigned int HTTP_port = 8080;
+        try{
+            HTTP_port = conf.getUInt("HTTP.port");
+        }
+        catch(Poco::NotFoundException& e){}
 
-
-        HTTPServer s(new request_handler, ServerSocket(8080), new HTTPServerParams);
+        HTTPServer s(new request_handler, ServerSocket(HTTP_port), new HTTPServerParams);
         s.start();
         this->logger().information("starting webserver");
         waitForTerminationRequest();
