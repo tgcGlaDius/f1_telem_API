@@ -30,13 +30,7 @@ class timing_handler : public packet_handler{
 
 public:
     timing_handler() = delete;
-    explicit timing_handler(std::shared_ptr<f1_storage>& stor): packet_handler(stor){
-#if DEBUG
-    stor->diff_sys_mut.lock();
-    stor->system = &checkpoint_sys;
-    stor->diff_sys_mut.unlock();
-#endif
-    }
+    explicit timing_handler(std::shared_ptr<f1_storage>& stor): packet_handler(stor){}
     void run() override{
         running = true;
         telem->LapData_mut.lock();
@@ -84,7 +78,6 @@ public:
                 }
             }
 
-            //TODO: implement marshal zone system
             //end new marshal zone system
 
             //old breadcrumb based timing system. optimal for when short distance between drivers

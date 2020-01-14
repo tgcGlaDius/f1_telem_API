@@ -110,16 +110,6 @@ public:
                 auto p = telem->driver_diffs;
                 telem->timing_mut.unlock();
                 base_obj->set("timing", p);
-                #if DEBUG
-                if(debug){
-                    telem->diff_sys_mut.lock();
-                    if(telem->system != nullptr){
-                        base_obj->set("timing_system", *telem->system);
-                    }
-                    telem->diff_sys_mut.unlock();
-
-                }
-                #endif
             }
 
 
@@ -155,7 +145,6 @@ public:
         std::string fmt = req.get("fmt", "2018");
         if(uri.getPath() == "/f1telem"){
             if(fmt=="2018"){return new f12018_telem_handler;}
-
         }
         return new req_404;
     }
@@ -169,6 +158,7 @@ public:
 protected:
 
     int main(const std::vector<std::string> &) override {
+        loadConfiguration();
         Poco::Util::LayeredConfiguration& conf = config();
 
         AutoPtr<ConsoleChannel> pCons(new ConsoleChannel);

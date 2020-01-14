@@ -37,44 +37,43 @@ Poco::JSON::Object toJSON(PacketParticipantsData pack);
 
 Poco::JSON::Object toJSON(PacketSessionData pack);
 
-typedef Poco::FastMutex mutex;
+typedef Poco::FastMutex _mutex;
 
 
 
 struct f1_storage {
-    mutex Header_mut;
+    _mutex Header_mut;
     PacketHeader Header = {0,};
 
-    mutex CarSetups_mut;
+    _mutex CarSetups_mut;
     PacketCarSetupData CarSetupData = {0,};
 
-    mutex CarStatus_mut;
+    _mutex CarStatus_mut;
     PacketCarStatusData CarStatusData = {0,};
 
-    mutex CarTelemetry_mut;
+    _mutex CarTelemetry_mut;
     PacketCarTelemetryData CarTelemetryData = {0,};
 
-    mutex Event_mut;
+    _mutex Event_mut;
     PacketEventData EventData = {0,};
 
-    mutex LapData_mut;
+    _mutex LapData_mut;
     PacketLapData LapData = {0,};
 
-    mutex Motion_mut;
+    _mutex Motion_mut;
     PacketMotionData MotionData = {0,};
 
-    mutex Participants_mut;
+    _mutex Participants_mut;
     PacketParticipantsData ParticipantsData = {0,};
 
-    mutex Session_mut;
+    _mutex Session_mut;
     PacketSessionData SessionData = {0,};
 
-    mutex timing_mut;
+    _mutex timing_mut;
     std::vector<float> driver_diffs;
 
 #if DEBUG
-    mutex diff_sys_mut;
-    std::vector<bool>* system = nullptr;
+
 #endif
 
 };
